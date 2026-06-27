@@ -440,6 +440,7 @@ a:focus-visible, button:focus-visible{outline:2px solid var(--accent-2); outline
                         <textarea id="message" rows="4" required placeholder="What would you like to talk about?"></textarea>
                     </div>
                     <button type="submit" class="btn-primary" style="border:none; cursor:pointer; width:100%; justify-content:center;">Send Message →</button>
+                    <div id="formStatus" style="margin-top:0.8rem; font-size:0.82rem; font-family:'JetBrains Mono',monospace; min-height:1.2em;"></div>
                 </form>
             </div>
             <div class="contact-links reveal">
@@ -493,15 +494,49 @@ window.addEventListener('scroll', ()=>{
     });
 });
 
-// Contact form -> mailto fallback (no backend)
-document.getElementById('contactForm').addEventListener('submit', function(e){
+// Contact form -> sends a real email via FormSubmit.co (free, no backend needed)
+document.getElementById('contactForm').addEventListener('submit', async function(e){
     e.preventDefault();
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const message = document.getElementById('message').value;
-    const subject = encodeURIComponent('Portfolio inquiry from ' + name);
-    const body = encodeURIComponent(message + '\n\n— ' + name + ' (' + email + ')');
-    window.location.href = `mailto:aahsankhaan7@gmail.com?subject=${subject}&body=${body}`;
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const messageInput = document.getElementById('message');
+    const btn = this.querySelector('button[type="submit"]');
+    const statusEl = document.getElementById('formStatus');
+    const originalLabel = btn.textContent;
+
+    btn.disabled = true;
+    btn.textContent = 'Sending…';
+    statusEl.style.color = 'var(--text-muted)';
+    statusEl.textContent = '';
+
+    try {
+        const res = await fetch('https://formsubmit.co/ajax/aahsankhaan7@gmail.com', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                name: nameInput.value,
+                email: emailInput.value,
+                message: messageInput.value,
+                _subject: 'Portfolio inquiry from ' + nameInput.value,
+                _captcha: false
+            })
+        });
+
+        if (res.ok) {
+            btn.textContent = 'Message sent ✓';
+            statusEl.style.color = 'var(--success)';
+            statusEl.textContent = "Thanks — I'll get back to you soon.";
+            this.reset();
+        } else {
+            throw new Error('Request failed');
+        }
+    } catch (err) {
+        btn.textContent = 'Send Message →';
+        statusEl.style.color = '#f87171';
+        statusEl.textContent = "Couldn't send — please email aahsankhaan7@gmail.com directly.";
+    } finally {
+        setTimeout(() => { btn.disabled = false; if (btn.textContent !== 'Send Message →') btn.textContent = originalLabel; }, 2500);
+    }
 });
 
 // Terminal typewriter
