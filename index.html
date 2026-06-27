@@ -22,8 +22,13 @@
     --ice:#bfe3ff;
     --crystal:#eaf6ff;
     --silver:rgba(235,242,255,0.85);
+    --sapphire:#1e3a8a;
+    --sapphire-glow:#3b6dfb;
+    --ocean:#0ea5e9;
+    --ocean-deep:#0369a1;
     --grad-main:linear-gradient(135deg,#6366f1 0%,#8b5cf6 50%,#ec4899 100%);
     --grad-ice:linear-gradient(135deg, rgba(191,227,255,0.9), rgba(167,139,250,0.9));
+    --grad-ocean:linear-gradient(135deg, rgba(14,165,233,0.85), rgba(59,109,251,0.85));
     --text:#eef0fb;
     --text-muted:#9090b8;
     --success:#34d399;
@@ -59,10 +64,11 @@ section{padding:110px 6vw 40px; position:relative;}
 
 /* ================= Aurora + particle backdrop ================= */
 .backdrop{position:fixed; inset:0; z-index:-2; overflow:hidden; background:
-    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(124,58,237,0.22), transparent 60%),
-    radial-gradient(ellipse 70% 60% at 85% 15%, rgba(6,182,212,0.16), transparent 60%),
-    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(191,227,255,0.07), transparent 65%),
-    linear-gradient(160deg,#05050b 0%,#0c0a22 40%,#171037 70%,#05050b 100%);
+    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(124,58,237,0.24), transparent 60%),
+    radial-gradient(ellipse 70% 60% at 85% 15%, rgba(6,182,212,0.18), transparent 60%),
+    radial-gradient(ellipse 65% 55% at 60% 90%, rgba(14,165,233,0.16), transparent 65%),
+    radial-gradient(ellipse 60% 50% at 10% 60%, rgba(59,109,251,0.12), transparent 65%),
+    linear-gradient(160deg,#05050b 0%,#0a1230 32%,#11144a 55%,#0d1a3d 78%,#05050b 100%);
 }
 .backdrop::before, .backdrop::after{
     content:''; position:absolute; border-radius:50%; filter:blur(110px); pointer-events:none;
@@ -77,6 +83,13 @@ section{padding:110px 6vw 40px; position:relative;}
     background:radial-gradient(circle, rgba(6,182,212,0.22), transparent 70%);
     animation:blobFloat2 30s ease-in-out infinite;
 }
+.ocean-blob{
+    position:fixed; top:38%; left:55%; width:42vw; height:42vw;
+    background:radial-gradient(circle, rgba(14,165,233,0.26), transparent 70%);
+    filter:blur(120px); border-radius:50%; pointer-events:none; z-index:-2;
+    animation:blobFloat3 22s ease-in-out infinite;
+}
+@keyframes blobFloat3{0%,100%{transform:translate(-50%,-50%) scale(1);}50%{transform:translate(-58%,-42%) scale(1.2);}}
 @keyframes blobFloat1{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(8%,10%) scale(1.15);}}
 @keyframes blobFloat2{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(-7%,-9%) scale(1.1);}}
 #particles{position:fixed; inset:0; z-index:-1; pointer-events:none;}
@@ -219,13 +232,65 @@ nav{
 .ai-stat .n{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:1.25rem; color:var(--crystal);}
 .ai-stat .l{font-family:'JetBrains Mono',monospace; font-size:0.62rem; color:var(--text-muted); letter-spacing:0.08em; text-transform:uppercase; margin-top:0.1rem;}
 
-/* ================= Glass card base ================= */
+/* ================= Hero video / data-flow layer ================= */
+.hero{position:relative; overflow:hidden;}
+.hero-video-wrap{position:absolute; inset:0; z-index:0; overflow:hidden;}
+.hero-video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.32; filter:saturate(1.15) brightness(0.85); display:none;}
+.hero-video.active{display:block;}
+#heroFlow{position:absolute; inset:0; width:100%; height:100%;}
+.hero-video-overlay{position:absolute; inset:0; background:linear-gradient(180deg, rgba(5,5,11,0.25) 0%, rgba(5,5,11,0.55) 55%, rgba(5,5,11,0.92) 100%);}
+.hero-grid{position:relative; z-index:1;}
+
+/* ================= Specialization pills ================= */
+.spec-pills{display:flex; gap:0.6rem; flex-wrap:wrap; margin-bottom:1.8rem;}
+.spec-pill{
+    font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.02em;
+    padding:0.4rem 0.9rem; border-radius:999px; border:1px solid var(--border);
+    background:rgba(255,255,255,0.04); color:var(--ice); backdrop-filter:blur(8px);
+    transition:border-color 0.25s, color 0.25s;
+}
+.spec-pill:hover{border-color:var(--accent-glow); color:var(--text);}
+
+/* ================= Stats strip ================= */
+.stats-strip{
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:1.5rem;
+    background:linear-gradient(160deg, rgba(255,255,255,0.06), rgba(255,255,255,0.015) 65%);
+    border:1px solid var(--border); border-radius:18px; padding:1.7rem 2.2rem;
+    backdrop-filter:blur(22px) saturate(180%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.18), 0 20px 44px -16px rgba(0,0,0,0.5);
+}
+.stat-block{text-align:center; flex:1; min-width:120px;}
+.stat-block .num{
+    font-family:'Space Grotesk',sans-serif; font-weight:800; font-size:2.1rem;
+    background:linear-gradient(135deg,#fff,var(--accent-glow),var(--accent-2));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.stat-block .lbl{font-family:'JetBrains Mono',monospace; font-size:0.64rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-muted); margin-top:0.35rem;}
+
+/* ================= Featured project spotlight ================= */
+.featured-card{padding:0; overflow:hidden;}
+.featured-grid{display:grid; grid-template-columns:1fr 1.1fr;}
+.featured-visual{position:relative; min-height:280px; background:rgba(255,255,255,0.02); border-right:1px solid var(--border);}
+.featured-visual canvas{position:absolute; inset:0; width:100%; height:100%;}
+.featured-badge{
+    position:absolute; top:1rem; left:1rem; z-index:2;
+    font-family:'JetBrains Mono',monospace; font-size:0.62rem; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--success); background:rgba(52,211,153,0.1); border:1px solid rgba(52,211,153,0.3);
+    border-radius:999px; padding:0.3rem 0.7rem;
+}
+.featured-info{padding:2.2rem 2.4rem; display:flex; flex-direction:column; justify-content:center;}
+.featured-info .ptitle{font-size:1.45rem; margin-bottom:0.7rem;}
+.featured-info .pdesc{font-size:0.95rem; margin-bottom:1.2rem;}
+@media (max-width:900px){
+    .featured-grid{grid-template-columns:1fr;}
+    .featured-visual{min-height:200px;}
+}
 .card{
     background:linear-gradient(160deg, rgba(255,255,255,0.07), rgba(255,255,255,0.015) 65%);
     backdrop-filter:blur(24px) saturate(180%);
     border:1px solid var(--border); border-radius:20px;
     padding:1.8rem; position:relative; overflow:hidden;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.3), 0 24px 48px -14px rgba(0,0,0,0.5);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.3), 0 24px 48px -14px rgba(0,0,0,0.5), 0 0 50px -20px rgba(14,165,233,0.35);
     transition:transform 0.35s cubic-bezier(.2,.8,.2,1), box-shadow 0.35s cubic-bezier(.2,.8,.2,1), border-color 0.35s;
     transform-style:preserve-3d; will-change:transform;
 }
@@ -328,6 +393,7 @@ a:focus-visible, button:focus-visible{outline:2px solid var(--accent-2); outline
 <body class="locked">
 
 <div class="backdrop"></div>
+<div class="ocean-blob"></div>
 <canvas id="particles"></canvas>
 <div id="cursorGlow"></div>
 
@@ -362,11 +428,25 @@ a:focus-visible, button:focus-visible{outline:2px solid var(--accent-2); outline
 
 <!-- ============ HERO ============ -->
 <section class="hero" id="top">
+    <div class="hero-video-wrap">
+        <video class="hero-video" id="heroVideo" autoplay muted loop playsinline>
+            <source src="hero-bg.webm" type="video/webm">
+            <source src="hero-bg.mp4" type="video/mp4">
+        </video>
+        <canvas id="heroFlow"></canvas>
+        <div class="hero-video-overlay"></div>
+    </div>
     <div class="hero-grid">
         <div>
             <div class="status-badge reveal"><span class="pulse"></span> Open to new opportunities &amp; freelance AI/ML work</div>
             <h1><span id="heroType"></span></h1>
             <p class="lede" id="heroLede">I'm Ahsan — a Data Science undergrad who builds end-to-end RAG pipelines, LLM agents, and applied ML systems, not just notebooks.</p>
+            <div class="spec-pills reveal">
+                <span class="spec-pill">RAG Pipelines</span>
+                <span class="spec-pill">LLM Agents</span>
+                <span class="spec-pill">Applied ML</span>
+                <span class="spec-pill">Data Analysis</span>
+            </div>
             <div class="hero-cta reveal">
                 <a class="btn-primary magnetic" href="https://github.com/ahsanKhan-7" target="_blank" rel="noopener">View Projects ⚡</a>
                 <a class="btn-secondary magnetic" href="#contact">Get in touch</a>
@@ -384,6 +464,40 @@ a:focus-visible, button:focus-visible{outline:2px solid var(--accent-2); outline
                     <div class="ai-stat"><div class="n" data-count="4">0</div><div class="l">Projects shipped</div></div>
                     <div class="ai-stat"><div class="n" data-count="3">0</div><div class="l">RAG systems</div></div>
                     <div class="ai-stat"><div class="n" data-count="100">0</div><div class="l">% hands-on</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ STATS STRIP ============ -->
+<section id="stats" style="padding:50px 6vw 0;">
+    <div class="section-inner">
+        <div class="stats-strip reveal">
+            <div class="stat-block"><div class="num" data-count="4">0</div><div class="lbl">Projects Shipped</div></div>
+            <div class="stat-block"><div class="num" data-count="3">0</div><div class="lbl">RAG Systems Built</div></div>
+            <div class="stat-block"><div class="num" data-count="1">0</div><div class="lbl">Internship Completed</div></div>
+            <div class="stat-block"><div class="num" data-count="2">0</div><div class="lbl">Certifications</div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ FEATURED WORK ============ -->
+<section id="featured">
+    <div class="section-inner">
+        <div class="eyebrow">Featured Work</div>
+        <h2 class="section-title split-type">Flagship Project</h2>
+        <div class="card featured-card tilt reveal">
+            <div class="featured-grid">
+                <div class="featured-visual">
+                    <span class="featured-badge">● Live Demo Architecture</span>
+                    <canvas id="featuredCanvas"></canvas>
+                </div>
+                <div class="featured-info">
+                    <div class="ptitle">⚡ XORO AI — Video Intelligence Engine</div>
+                    <div class="pdesc">My flagship build: turns any video or audio into a searchable knowledge base. A full pipeline — ingestion → transcription → LLM summarization → structured action items &amp; decisions → a RAG chat layer — wrapped in a premium glass UI with live pipeline status.</div>
+                    <div class="tags"><span class="tag">LangChain</span><span class="tag">ChromaDB</span><span class="tag">Whisper</span><span class="tag">Streamlit</span><span class="tag">RAG</span></div>
+                    <div class="plinks"><a class="btn-primary magnetic" href="https://github.com/ahsanKhan-7" target="_blank" rel="noopener">View Code →</a></div>
                 </div>
             </div>
         </div>
@@ -467,16 +581,8 @@ a:focus-visible, button:focus-visible{outline:2px solid var(--accent-2); outline
 <section id="projects">
     <div class="section-inner">
         <div class="eyebrow">Selected Work</div>
-        <h2 class="section-title split-type">Projects</h2>
+        <h2 class="section-title split-type">More Projects</h2>
         <div class="project-grid stagger">
-
-            <div class="card project-card tilt reveal">
-                <div class="border-glow"></div>
-                <div class="ptitle">⚡ XORO AI — Video Intelligence Engine</div>
-                <div class="pdesc">Turns any video/audio into a searchable knowledge base: ingestion → transcription → LLM summarization → structured action items &amp; decisions → a RAG chat layer to query the content directly.</div>
-                <div class="tags"><span class="tag">LangChain</span><span class="tag">ChromaDB</span><span class="tag">Whisper</span><span class="tag">Streamlit</span></div>
-                <div class="plinks"><a class="plink" href="https://github.com/ahsanKhan-7" target="_blank" rel="noopener">View Code →</a></div>
-            </div>
 
             <div class="card project-card tilt reveal">
                 <div class="border-glow"></div>
@@ -696,10 +802,10 @@ const titleIO = new IntersectionObserver((entries)=>{
 document.querySelectorAll('.section-title').forEach(t=>titleIO.observe(t));
 
 /* ============================================================
-   STAT COUNT-UP (hero AI panel)
+   STAT COUNT-UP (reusable)
 ============================================================ */
-function countUpStats(){
-    document.querySelectorAll('.ai-stat .n').forEach(el=>{
+function countUp(selector){
+    document.querySelectorAll(selector).forEach(el=>{
         const target = parseInt(el.dataset.count, 10);
         let cur = 0;
         const dur = 900;
@@ -712,6 +818,17 @@ function countUpStats(){
         }
         requestAnimationFrame(tick);
     });
+}
+function countUpStats(){ countUp('.ai-stat .n'); }
+
+const statsStripEl = document.querySelector('.stats-strip');
+if(statsStripEl){
+    const statsIO = new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{
+            if(e.isIntersecting){ countUp('.stat-block .num'); statsIO.unobserve(e.target); }
+        });
+    }, {threshold:0.3});
+    statsIO.observe(statsStripEl);
 }
 
 /* ============================================================
@@ -765,10 +882,9 @@ if(!IS_TOUCH && !REDUCE_MOTION){
 }
 
 /* ============================================================
-   NEURAL NETWORK CANVAS (hero AI panel)
+   NEURAL NETWORK CANVAS (reusable — AI panel + featured spotlight)
 ============================================================ */
-(function(){
-    const canvas = document.getElementById('neuralCanvas');
+function createNeuralCanvas(canvas, nodeCount){
     const ctx = canvas.getContext('2d');
     let nodes = [];
     const COLORS = ['rgba(167,139,250,0.9)','rgba(6,182,212,0.9)','rgba(191,227,255,0.9)'];
@@ -781,7 +897,7 @@ if(!IS_TOUCH && !REDUCE_MOTION){
         initNodes(rect.width, rect.height);
     }
     function initNodes(w,h){
-        const n = w < 200 ? 10 : 16;
+        const n = nodeCount || (w < 200 ? 10 : 16);
         nodes = Array.from({length:n}, ()=>({
             x: Math.random()*w, y: Math.random()*h,
             vx: (Math.random()-0.5)*0.25, vy: (Math.random()-0.5)*0.25,
@@ -821,6 +937,67 @@ if(!IS_TOUCH && !REDUCE_MOTION){
     window.addEventListener('resize', resize);
     resize();
     frame();
+}
+
+const neuralEl = document.getElementById('neuralCanvas');
+if(neuralEl) createNeuralCanvas(neuralEl, 16);
+const featuredEl = document.getElementById('featuredCanvas');
+if(featuredEl) createNeuralCanvas(featuredEl, 22);
+
+/* ============================================================
+   HERO VIDEO LAYER — uses a real <video> if hero-bg.mp4/webm
+   exists next to index.html; otherwise falls back to a
+   generative "data-flow" canvas animation that looks video-like.
+============================================================ */
+(function(){
+    const video = document.getElementById('heroVideo');
+    const canvas = document.getElementById('heroFlow');
+
+    video.addEventListener('canplay', ()=>{
+        video.classList.add('active');
+        canvas.style.display = 'none';
+    });
+    video.addEventListener('error', ()=>{ canvas.style.display = 'block'; });
+    // If no source ever loads, error never fires reliably on <source> children in all browsers —
+    // safety check: if video has no data after a short delay, keep the canvas fallback visible.
+    setTimeout(()=>{ if(video.readyState < 2) canvas.style.display = 'block'; }, 1200);
+
+    const ctx = canvas.getContext('2d');
+    let streaks = [];
+    function resize(){
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+        const n = Math.min(36, Math.floor(canvas.width/28));
+        streaks = Array.from({length:n}, ()=>spawnStreak());
+    }
+    function spawnStreak(){
+        const colors = ['rgba(167,139,250,', 'rgba(6,182,212,', 'rgba(191,227,255,'];
+        return {
+            x: Math.random()*canvas.width,
+            y: Math.random()*canvas.height,
+            len: 60 + Math.random()*140,
+            speed: 0.6 + Math.random()*1.4,
+            color: colors[Math.floor(Math.random()*colors.length)],
+            alpha: 0.08 + Math.random()*0.16
+        };
+    }
+    function frame(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        streaks.forEach(s=>{
+            s.x += s.speed;
+            if(s.x - s.len > canvas.width){ s.x = -s.len; s.y = Math.random()*canvas.height; }
+            const grad = ctx.createLinearGradient(s.x - s.len, s.y, s.x, s.y);
+            grad.addColorStop(0, s.color + '0)');
+            grad.addColorStop(1, s.color + s.alpha + ')');
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = 1.4;
+            ctx.beginPath(); ctx.moveTo(s.x - s.len, s.y); ctx.lineTo(s.x, s.y); ctx.stroke();
+        });
+        if(!REDUCE_MOTION) requestAnimationFrame(frame);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+    if(!REDUCE_MOTION) frame(); else { frame(); } // draw at least one static frame either way
 })();
 
 /* ============================================================
@@ -833,11 +1010,15 @@ if(!IS_TOUCH && !REDUCE_MOTION){
     function resize(){
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
         const count = Math.min(45, Math.floor((window.innerWidth*window.innerHeight)/35000));
-        particles = Array.from({length:count}, ()=>({
-            x: Math.random()*canvas.width, y: Math.random()*canvas.height,
-            r: 0.6+Math.random()*1.4, vx:(Math.random()-0.5)*0.12, vy:(Math.random()-0.5)*0.12,
-            a: Math.random()*Math.PI*2, ice: Math.random() < 0.35
-        }));
+        particles = Array.from({length:count}, ()=>{
+            const r = Math.random();
+            return {
+                x: Math.random()*canvas.width, y: Math.random()*canvas.height,
+                r: 0.6+Math.random()*1.4, vx:(Math.random()-0.5)*0.12, vy:(Math.random()-0.5)*0.12,
+                a: Math.random()*Math.PI*2,
+                kind: r < 0.34 ? 'ice' : (r < 0.64 ? 'ocean' : 'violet')
+            };
+        });
     }
     let t = 0;
     function frame(){
@@ -850,7 +1031,9 @@ if(!IS_TOUCH && !REDUCE_MOTION){
             const tw = 0.35 + 0.25*Math.sin(t*2 + p.a);
             ctx.beginPath();
             ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-            ctx.fillStyle = p.ice ? `rgba(191,227,255,${tw*0.6})` : `rgba(167,139,250,${tw*0.45})`;
+            ctx.fillStyle = p.kind === 'ice' ? `rgba(191,227,255,${tw*0.6})`
+                : p.kind === 'ocean' ? `rgba(14,165,233,${tw*0.55})`
+                : `rgba(167,139,250,${tw*0.45})`;
             ctx.fill();
         });
         requestAnimationFrame(frame);
